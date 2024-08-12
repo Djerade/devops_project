@@ -1,0 +1,26 @@
+{
+  "name": "node",
+  "version": "1.0.0",
+  "description": "learning",
+  "main": "indexe.js",
+  "type": "commonjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./Backend/indexe.js",
+    "dev": "nodemon ./Backend/indexe.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server-express": "^3.13.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-generator": "^4.16.1",
+    "graphql": "^16.9.0",
+    "gridfs-stream": "^1.1.1",
+    "mongoose": "^8.5.2",
+    "multer": "^1.4.4",
+    "multer-gridfs-storage": "^5.0.2",
+    "nodemon": "^3.1.4"
+  }
+}
