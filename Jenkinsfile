@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Cloner le dépôt') {
             steps {
-                git 'https://github.com/Djerade/website.git'
+                git 'https://github.com/Djerade/devops_project.git'
             }
         }
         stage('checkout') {
