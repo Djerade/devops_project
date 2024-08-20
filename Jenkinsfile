@@ -13,7 +13,7 @@ pipeline {
         }
         stage('Installer les dépendances') {
             steps {
-                bat 'npm install'
+                bat 'npm i nstall'
             }
         }
         stage('Build') {
