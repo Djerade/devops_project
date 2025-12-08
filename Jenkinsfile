@@ -2,16 +2,38 @@ pipeline {
     agent any
     
     stages {
+        stage('Vérifier les fichiers') {
+            steps {
+                script {
+                    sh '''
+                        echo "Workspace: $WORKSPACE"
+                        ls -la
+                        if [ -f package.json ]; then
+                            echo "package.json trouvé ✓"
+                        else
+                            echo "ERREUR: package.json non trouvé!"
+                            exit 1
+                        fi
+                    '''
+                }
+            }
+        }
+        
         stage('Installer les dépendances') {
             steps {
                 script {
-                    // Utiliser un conteneur Docker pour npm
+                    // Utiliser Docker pour npm avec le chemin absolu
                     sh '''
+                        WORKSPACE_PATH=$(pwd)
+                        echo "Workspace path: $WORKSPACE_PATH"
+                        echo "Contenu du workspace:"
+                        ls -la
+                        echo "Installation des dépendances avec Docker..."
                         docker run --rm \
-                            -v "$WORKSPACE:/workspace" \
+                            -v "$WORKSPACE_PATH:/workspace" \
                             -w /workspace \
                             node:20-alpine \
-                            npm install
+                            sh -c "pwd && ls -la && cat package.json && npm install"
                     '''
                 }
             }
