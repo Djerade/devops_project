@@ -2,19 +2,13 @@ pipeline {
     agent any
     
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-        
         stage('Installer les dépendances') {
             steps {
                 script {
-                    // Utiliser un conteneur Docker pour npm si npm n'est pas disponible dans Jenkins
+                    // Utiliser un conteneur Docker pour npm
                     sh '''
                         docker run --rm \
-                            -v "$PWD:/workspace" \
+                            -v "$WORKSPACE:/workspace" \
                             -w /workspace \
                             node:20-alpine \
                             npm install
@@ -27,8 +21,8 @@ pipeline {
             steps {
                 script {
                     echo 'Building Docker image...'
-                    sh 'docker build -t devops-app:${BUILD_NUMBER} .'
-                    sh 'docker tag devops-app:${BUILD_NUMBER} devops-app:latest'
+                    sh "docker build -t devops-app:${BUILD_NUMBER} ."
+                    sh "docker tag devops-app:${BUILD_NUMBER} devops-app:latest"
                 }
             }
         }
