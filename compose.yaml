@@ -1,23 +1,43 @@
 
 services:
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    # Port mapping removed - MongoDB accessible only within Docker network
+    # If you need external access, use: "27018:27017" instead
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: fileStorage
+
   server:
     build:
       context: .
     environment:
       NODE_ENV: production
+      MONGO_URI: mongodb://mongodb:27017/fileStorage
     ports:
       - 5000:5000
+    depends_on:
+      - mongodb
 
   jenkins:
-    image: jenkins/jenkins:lts
+    build:
+      context: ./CI
+      dockerfile: Dockerfile
     container_name: jenkins
+    user: root
     ports:
       - "8080:8080"
       - "50000:50000"
     volumes:
       - jenkins_homes:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
 
 
 
 volumes:
   jenkins_homes:
+  mongodb_data:

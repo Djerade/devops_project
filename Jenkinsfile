@@ -1,36 +1,69 @@
 pipeline {
     agent any
+    
     stages {
-        stage('Cloner le dépôt') {
-            steps {
-                git 'https://github.com/Djerade/devops_project.git'
-            }
-        }
-        stage('checkout') {
+        stage('Checkout') {
             steps {
                 checkout scm
             }
         }
+        
         stage('Installer les dépendances') {
             steps {
-                bat 'npm i nstall'
+                script {
+                    // Utiliser un conteneur Docker pour npm si npm n'est pas disponible dans Jenkins
+                    sh '''
+                        docker run --rm \
+                            -v "$PWD:/workspace" \
+                            -w /workspace \
+                            node:20-alpine \
+                            npm install
+                    '''
+                }
             }
         }
-        stage('Build') {
+        
+        stage('Build Docker') {
             steps {
-                echo 'Building..'
-                bat 'npm run build'
+                script {
+                    echo 'Building Docker image...'
+                    sh 'docker build -t devops-app:${BUILD_NUMBER} .'
+                    sh 'docker tag devops-app:${BUILD_NUMBER} devops-app:latest'
+                }
             }
         }
+        
         stage('Test') {
             steps {
-                echo 'Testing..'
+                script {
+                    echo 'Running tests...'
+                    // Ajoutez vos tests ici quand ils seront disponibles
+                    // sh 'npm test'
+                }
             }
         }
+        
         stage('Deploy') {
             steps {
-                echo 'Deploying....'
+                script {
+                    echo 'Deploying application...'
+                    // Ajoutez votre logique de déploiement ici
+                    // Par exemple: docker compose up -d
+                }
             }
+        }
+    }
+    
+    post {
+        success {
+            echo 'Pipeline réussi!'
+        }
+        failure {
+            echo 'Pipeline échoué!'
+        }
+        always {
+            echo 'Nettoyage...'
+            // Nettoyage optionnel
         }
     }
 }
