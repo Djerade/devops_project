@@ -9,15 +9,40 @@ pipeline {
             }
         }
         
+        stage('Vérifier les fichiers') {
+            steps {
+                script {
+                    sh '''
+                        echo "Workspace: $WORKSPACE"
+                        echo "Répertoire actuel: $(pwd)"
+                        echo "Contenu du workspace:"
+                        ls -la
+                        if [ -f package.json ]; then
+                            echo "✓ package.json trouvé"
+                            cat package.json | head -5
+                        else
+                            echo "✗ ERREUR: package.json non trouvé!"
+                            exit 1
+                        fi
+                    '''
+                }
+            }
+        }
+        
         stage('Installer les dépendances') {
             steps {
                 script {
                     sh '''
+                        WORKSPACE_PATH=$(pwd)
+                        echo "Installation dans: $WORKSPACE_PATH"
+                        echo "Vérification avant Docker:"
+                        ls -la
                         docker run --rm \
-                            -v "$WORKSPACE:/workspace" \
+                            -v "$WORKSPACE_PATH:/workspace" \
                             -w /workspace \
+                            --user root \
                             node:20-alpine \
-                            npm install
+                            sh -c "echo 'Dans le conteneur:' && pwd && ls -la /workspace && test -f /workspace/package.json && echo 'package.json trouvé!' && npm install"
                     '''
                 }
             }

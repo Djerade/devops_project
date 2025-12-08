@@ -28,12 +28,20 @@ pipeline {
                         echo "Workspace path: $WORKSPACE_PATH"
                         echo "Contenu du workspace:"
                         ls -la
+                        echo "Vérification de package.json:"
+                        if [ -f package.json ]; then
+                            cat package.json | head -10
+                        else
+                            echo "ERREUR: package.json non trouvé dans le workspace!"
+                            exit 1
+                        fi
                         echo "Installation des dépendances avec Docker..."
                         docker run --rm \
                             -v "$WORKSPACE_PATH:/workspace" \
                             -w /workspace \
+                            --user root \
                             node:20-alpine \
-                            sh -c "pwd && ls -la && cat package.json && npm install"
+                            sh -c "echo 'Dans le conteneur:' && pwd && ls -la /workspace && test -f /workspace/package.json && echo 'package.json trouvé!' && npm install"
                     '''
                 }
             }
