@@ -36,12 +36,15 @@ pipeline {
                             exit 1
                         fi
                         echo "Installation des dépendances avec Docker..."
+                        # Vérifier que les fichiers sont accessibles
+                        echo "Test d'accès aux fichiers:"
+                        test -f "$WORKSPACE_PATH/package.json" && echo "✓ package.json accessible" || echo "✗ package.json non accessible"
+                        # Utiliser docker run avec bind mount
                         docker run --rm \
                             -v "$WORKSPACE_PATH:/workspace" \
                             -w /workspace \
-                            --user root \
                             node:20-alpine \
-                            sh -c "echo 'Dans le conteneur:' && pwd && ls -la /workspace && test -f /workspace/package.json && echo 'package.json trouvé!' && npm install"
+                            sh -c "ls -la && if [ -f package.json ]; then npm install; else echo 'ERREUR: package.json non trouvé'; exit 1; fi"
                     '''
                 }
             }
